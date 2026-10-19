@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parent.parent
 ASSET = Path(__file__).parent/'assets'/'lab.html'
 JOBS = {}
 LOCK = threading.Lock()
+CATALOG_LOCK = threading.Lock()
+CATALOG_SNAPSHOT = None
 
 
 def frame_from(step, observation, protocol):
@@ -42,6 +44,16 @@ def present_run(run, protocol, truth=None, forcing=None, label='Recorded experim
 
 
 def catalog():
+    # Stable numeric IDs for the lifetime of this server/export process, even
+    # when a benchmark is concurrently appending completed runs to its index.
+    global CATALOG_SNAPSHOT
+    with CATALOG_LOCK:
+        if CATALOG_SNAPSHOT is None:
+            CATALOG_SNAPSHOT = build_catalog()
+        return CATALOG_SNAPSHOT
+
+
+def build_catalog():
     entries = []
     replication = ROOT/'results'/'replication-001'
     if (replication/'index.json').exists():

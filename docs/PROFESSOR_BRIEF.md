@@ -1,3 +1,19 @@
+# Version 0.5 update: parameter-aware revision
+
+The new optional selector propagates local uncertainty in all fitted parameters, including added force parameters, into predicted trajectories. This retains a selection signal when structural disagreement collapses. It is a regularized local approximation, not calibrated Bayesian inference or expected information gain.
+
+A new frozen comparison completed 24 runs: four new designed systems, two paired noise seeds and three selection policies, with equal four-experiment budgets. Forty unseen initial conditions are used for post-run evaluation. The primary metric averages error over rounds 2–4, then averages seeds within systems.
+
+The parameter-aware policy improved the primary metric in 3/4 systems versus structural revision, but its mean difference was +0.000124 (slightly worse overall). Versus random revision, it improved 3/4 systems with mean difference −0.012220. These four-system descriptive results do not establish general superiority; the new policy remains optional. Final-round error and the predeclared primary metric are different measures.
+
+The implementation fixes the vanished uncertainty signal, but does not establish a reliable average accuracy gain over structural revision. This negative result is retained, alongside all raw outcomes and frozen source hashes. The live parameter-aware investigation completed successfully. There are 28 automated tests including a new stable replay-ID regression test; the core 27-test suite and the updated three-test lab suite passed.
+
+Open `results/replication-001/report.html` for the full comparison and `docs/REVISION_UNCERTAINTY.md` for the derivation and limitations. Reproduce with `python -m active_discovery.replication_suite --out results/new-replication`.
+
+Interview framing: investigated a failure mode in finite-library experimental design, implemented parameter-aware acquisition, and evaluated the proposed fix against paired baselines while preserving negative results. Do not describe the new method as a proven improvement or a novel general AI scientist.
+
+---
+
 # Active Discovery Lab — professor briefing
 
 Research question: can an experimental-design system recognize that its equations are inadequate, expand a finite hypothesis library, and test the revised explanation?

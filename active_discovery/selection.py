@@ -54,6 +54,11 @@ def select_experiment(strategy, fits, history, pool, protocol, rng):
         return available[int(rng.integers(len(available)))], None
     if strategy == "systematic":
         return next(p for p in space_filling_order(pool) if p not in used), None
+    if strategy == 'active_information':
+        from .information import information_components
+        scores = [information_components(fits, experiment, protocol)['total'] for experiment in available]
+        index = int(np.argmax(scores))
+        return available[index], scores[index]
     if strategy not in {"active", "active_local"}:
         raise ValueError(f"Unknown strategy: {strategy}")
     scores = [acquisition_components(fits, experiment, protocol,

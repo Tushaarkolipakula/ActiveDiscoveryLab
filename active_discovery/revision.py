@@ -9,7 +9,7 @@ from .extended_models import fit_extensions, reweight
 from .models import fit_models
 from .selection import candidate_pool, select_experiment, acquisition_components
 
-POLICIES = ('fixed_active', 'always_active', 'revision_active', 'revision_random', 'revision_local')
+POLICIES = ('fixed_active', 'always_active', 'revision_active', 'revision_random', 'revision_local', 'revision_systematic', 'revision_information')
 
 
 def discover_revision(measure, protocol, policy='revision_active', budget=4, seed=0, starts=2, on_round=None):
@@ -55,9 +55,16 @@ def discover_revision(measure, protocol, policy='revision_active', budget=4, see
         if on_round:
             on_round(copy.deepcopy(record), copy.deepcopy(history[-1]))
         if step+1 < budget:
-            strategy = 'random' if policy == 'revision_random' else 'active_local' if policy == 'revision_local' else 'active'
+            strategy = {'revision_random':'random', 'revision_local':'active_local',
+                        'revision_systematic':'systematic', 'revision_information':'active_information'}.get(policy,'active')
             experiment, acquisition = select_experiment(strategy, candidates, history, pool, protocol, rng)
-            components = acquisition_components(candidates, experiment, protocol, include_parameters=strategy == 'active_local') if strategy != 'random' else None
+            if strategy == 'active_information':
+                from .information import information_components
+                components = information_components(candidates, experiment, protocol)
+            elif strategy in {'random','systematic'}:
+                components = None
+            else:
+                components = acquisition_components(candidates, experiment, protocol, include_parameters=strategy == 'active_local')
     observations = [{'experiment': asdict(o.experiment), 'times': o.times.tolist(), 'position': o.position.tolist()} for o in history]
     return {'strategy': policy, 'seed': seed, 'rounds': rounds, 'observations': observations,
             'candidate_fit_count': candidate_fit_count}
