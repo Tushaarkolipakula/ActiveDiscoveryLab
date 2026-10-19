@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "active-discovery-lab"
+version = "0.5.0"
+description = "Reproducible active experimental design for hidden dynamical systems"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3", "scipy>=1.11,<2", "matplotlib>=3.8,<4"]
+
+[tool.setuptools.packages.find]
+include = ["active_discovery*"]
+
+[tool.setuptools.package-data]
+active_discovery = ["assets/*.html"]
